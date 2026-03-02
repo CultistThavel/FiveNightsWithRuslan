@@ -28,29 +28,28 @@
 
         #office-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /* ИЗМЕНЕНО: теперь фон вписывается в экран целиком, ничего не обрезается */
-            background-size: 100% 100%; 
-            background-position: center; background-repeat: no-repeat;
+            /* ТЕПЕРЬ ФОН ВЛЕЗАЕТ ЦЕЛИКОМ, НИЧЕГО НЕ ОБРЕЗАЕТСЯ */
+            background-size: 100% 100%; background-position: center; background-repeat: no-repeat;
         }
 
         /* Кнопки управления */
         #door-btn {
             position: absolute; top: 40%; left: 0;
-            /* ИЗМЕНЕНО: Кнопка уменьшена ровно в 4 раза по площади */
-            width: 80px; height: 80px; 
-            background: rgba(255, 0, 0, 0.3);
+            /* КНОПКА МЕНЬШЕ В 4 РАЗА! (была 160х160, стала 80х80) */
+            width: 80px; height: 80px; background: rgba(255, 0, 0, 0.3);
             border: 3px solid rgba(255,255,255,0.5); color: white; cursor: pointer;
             z-index: 100; display: flex; justify-content: center; align-items: center;
-            font-size: 8px; /* Шрифт уменьшен, чтобы влезть в маленькую кнопку */
+            font-size: 10px;
         }
 
         #tablet-toggle {
             position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 60%; height: 120px; background: rgba(255, 0, 0, 0.4);
+            /* Чуть укоротил высоту, чтобы не мешала */
+            width: 60%; height: 70px; background: rgba(255, 0, 0, 0.4);
             border: 4px solid black; cursor: pointer; z-index: 500;
             display: flex; justify-content: center; align-items: center;
         }
-        #tablet-toggle span { color: black; font-size: 60px; font-weight: bold; }
+        #tablet-toggle span { color: black; font-size: 40px; font-weight: bold; }
 
         /* ПЛАНШЕТ С ТЕКСТОМ ВНУТРИ */
         #tablet-container {
@@ -61,7 +60,7 @@
             transition: bottom 0.4s ease-in-out; z-index: 400;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        #tablet-container.open { bottom: 130px; }
+        #tablet-container.open { bottom: 100px; }
 
         /* Контент внутри экрана планшета */
         #tablet-ui {
@@ -86,7 +85,8 @@
         /* Концовки */
         #game-over {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-image: url('https://www.dropbox.com/scl/fi/ck4qowly70bsbn29jrbw/Picsart_26-03-02_20-04-11-567.jpg?rlkey=7v6hv7kvg0xlzoiwp8gdqgemq&st=inr6e72n&raw=1');
+            /* Я ПОЧИНИЛ ЭТУ ССЫЛКУ!!! ДОБАВИЛ БУКВЫ 'ht' КОТОРЫЕ СЪЕЛ! */
+            background-image: url('https://www.dropbox.com/scl/fi/ck4qowlyht0bsbn29jrbw/Picsart_26-03-02_20-04-11-567.jpg?rlkey=7v6hv7kvg0xlzoiwp8gdqgemq&st=inr6e72n&raw=1');
             background-size: cover; z-index: 10000; display: none;
         }
         #win-screen {

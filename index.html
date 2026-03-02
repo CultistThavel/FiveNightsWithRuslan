@@ -2,100 +2,78 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Five Nights With Ruslan - Mobile Fixed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Five Nights With Ruslan - ULTIMATE FIX</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body, html {
             margin: 0; padding: 0; width: 100vw; height: 100vh;
             background-color: black; overflow: hidden;
             font-family: 'Press Start 2P', cursive; user-select: none;
-            display: flex; justify-content: center; align-items: center;
         }
 
         #disclaimer {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
             background: black; color: white; display: flex;
             justify-content: center; align-items: center; text-align: center;
-            z-index: 2000; cursor: pointer; padding: 20px; box-sizing: border-box;
-            font-size: 12px; line-height: 1.5;
+            z-index: 2000; cursor: pointer; padding: 40px; box-sizing: border-box;
+            font-size: 14px; line-height: 2;
         }
         #disc-text { display: none; }
 
-        /* ГЛАВНЫЙ КОНТЕЙНЕР С ФИКСИРОВАННЫМ РАЗМЕРОМ */
         #game-container {
-            position: relative; 
-            width: 100vw; 
-            height: 100vh; 
-            max-width: 100%; 
-            max-height: 100%;
-            display: none;
-            overflow: hidden;
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; display: none;
         }
 
-        /* ОФИС ТЕПЕРЬ ВСЕГДА ВЛЕЗАЕТ ЦЕЛИКОМ */
+        /* ФИКС ФОНА: Теперь он всегда вписан в экран и не обрезается */
         #office-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-size: contain; /* ЧТОБЫ ТЕКСТ БЫЛ ВИДЕН ПОЛНОСТЬЮ */
-            background-position: center; 
-            background-repeat: no-repeat;
-            background-color: #1a1a1a;
+            background-size: contain; background-position: center; background-repeat: no-repeat;
         }
 
-        /* КНОПКА DOOR УМЕНЬШЕНА В 4 РАЗА */
+        /* ФИКС КНОПКИ: Уменьшена в 4 раза (с 160px до 40px) */
         #door-btn {
-            position: absolute; 
-            top: 45%; 
-            left: 5%;
-            width: 40px; /* Было 160px */
-            height: 40px; /* Было 160px */
-            background: rgba(255, 0, 0, 0.5);
-            border: 1px solid white; 
-            color: white; 
-            cursor: pointer;
-            z-index: 100; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            font-size: 8px; /* Мелкий шрифт для мелкой кнопки */
-            border-radius: 5px;
+            position: absolute; top: 40%; left: 5%;
+            width: 40px; height: 40px; background: rgba(255, 0, 0, 0.3);
+            border: 2px solid rgba(255,255,255,0.5); color: white; cursor: pointer;
+            z-index: 100; display: flex; justify-content: center; align-items: center;
+            font-size: 8px; /* Текст тоже уменьшил, чтобы влез */
         }
 
-        /* ПЛАНШЕТ И КНОПКА ПЛАНШЕТА */
         #tablet-toggle {
-            position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
-            width: 50%; height: 40px; background: rgba(255, 0, 0, 0.4);
-            border: 2px solid black; cursor: pointer; z-index: 500;
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 50%; height: 60px; background: rgba(255, 0, 0, 0.4);
+            border: 3px solid black; cursor: pointer; z-index: 500;
             display: flex; justify-content: center; align-items: center;
         }
-        #tablet-toggle span { color: black; font-size: 20px; }
+        #tablet-toggle span { color: black; font-size: 30px; font-weight: bold; }
 
         #tablet-container {
             position: absolute; bottom: -120vh; left: 50%; transform: translateX(-50%);
-            width: 90vw; height: 70vh;
+            width: 90vw; height: 80vh;
             background-image: url('https://www.dropbox.com/scl/fi/1v8mb449dwf8dk9t5zj72/Picsart_26-03-02_21-03-49-458.png?rlkey=1zlecuityjxft1h8o6bky8r1p&st=palmnkk2&raw=1');
-            background-size: 100% 100%; transition: bottom 0.3s ease-in-out; z-index: 400;
+            background-size: 100% 100%; background-position: center;
+            transition: bottom 0.4s ease-in-out; z-index: 400;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        #tablet-container.open { bottom: 60px; }
+        #tablet-container.open { bottom: 70px; }
 
         #tablet-ui {
-            width: 80%; height: 50%;
-            display: flex; flex-direction: column; justify-content: space-around;
-            align-items: center; color: white; text-align: center;
+            width: 70%; height: 60%;
+            display: flex; flex-direction: column; justify-content: space-between;
+            align-items: center; color: white; text-align: center; pointer-events: none;
         }
-        #t-date { font-size: 8px; }
-        #t-time { font-size: 30px; }
-        #t-power { font-size: 10px; }
+        #t-date { font-size: 8px; margin-top: 10px; }
+        #t-time { font-size: 40px; text-shadow: 3px 3px 0px #000; }
+        #t-power { font-size: 10px; margin-bottom: 20px; }
 
-        /* ОСТАЛЬНОЕ БЕЗ ИЗМЕНЕНИЙ В ЛОГИКЕ */
         #screamer {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: url('https://www.dropbox.com/scl/fi/gfrq4h9jmtmfigo6zngp7/Picsart_26-03-02_19-57-24-208.jpg?rlkey=f76rc2zyarz530o6za1fxey8b&st=m6irds1l&raw=1');
-            background-size: cover; z-index: 9999; display: none;
+            background-size: 100% 100%; z-index: 9999; display: none;
         }
         .shake-flash { animation: shake 0.05s infinite, flash 0.1s infinite; }
-        @keyframes shake { 0% { transform: translate(5px,5px); } 50% { transform: translate(-5px,-5px); } }
+        @keyframes shake { 0% { transform: translate(10px,10px); } 50% { transform: translate(-10px,-10px); } }
         @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.6; } }
 
         #game-over {
@@ -107,17 +85,17 @@
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: black; color: white; z-index: 10000; display: none;
             flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; font-size: 14px;
+            text-align: center; font-size: 14px; padding: 20px;
         }
     </style>
 </head>
 <body>
 
-    <div id="disclaimer"><span id="disc-text">Предупреждение: Резкие сцены. Играйте на свой риск. <br><br> Тапните для начала.</span></div>
+    <div id="disclaimer"><span id="disc-text">Предупреждение: Игра имеет резкие сцены и неожиданные моменты, такие как скримеры или яркие вспышки. Играйте на своём риске. <br><br> Тапните на экран, чтобы начать игру.</span></div>
 
     <div id="game-container">
         <div id="office-bg"></div>
-        <div id="door-btn">DR</div>
+        <div id="door-btn">DOOR</div>
         <div id="tablet-toggle"><span>▲</span></div>
         <div id="tablet-container">
             <div id="tablet-ui">
@@ -130,10 +108,9 @@
 
     <div id="screamer"></div>
     <div id="game-over"></div>
-    <div id="win-screen">КОНЕЦ ДЕМО ВЕРСИИ. СПАСИБО!</div>
+    <div id="win-screen">Игра в демо версии, спасибо за игру.<br><br>Постараемся выпустить как можно скорее бета версию.</div>
 
     <script>
-        // ВСЯ ЛОГИКА ОСТАЛАСЬ ПРЕЖНЕЙ, Я ЕЁ НЕ ТРОГАЛ!
         const sfxOffice = new Audio("https://www.dropbox.com/scl/fi/stbompykujm2unodwnyxf/fnaf-1-office-running-sfx-made-with-Voicemod.mp3?rlkey=f6gjk8dcqyr9ex08vg3fgvcn2&st=rgmq6egu&raw=1");
         const sfxDoor = new Audio("https://www.dropbox.com/scl/fi/xqd8ophfm1rxtq4j9q2yb/SFXBible_12478.ogg.mp3?rlkey=tijiekcxqkb2ntc6bsnc5wtxf&st=l16h1bxc&raw=1");
         const sfxTablet = new Audio("https://www.dropbox.com/scl/fi/x46rgpezdkfrigh0kti86/fnaf-open-camera-sound.mp3?rlkey=stri1wynmnvjeyjvqd2dcbx23&st=cvmnfted&raw=1");
@@ -145,7 +122,7 @@
         let door = false, tablet = false, dead = false, win = false, powerOut = false;
         let ruslan = "none", rTimer = 0;
 
-        setTimeout(() => document.getElementById("disc-text").style.display = "block", 2000);
+        setTimeout(() => document.getElementById("disc-text").style.display = "block", 4000);
 
         document.getElementById("disclaimer").onclick = () => {
             if (document.getElementById("disc-text").style.display === "block") {

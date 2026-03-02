@@ -2,204 +2,209 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Five Nights With Ruslan - MINI UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ruslan Horror - Mobile Optimized</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body, html {
-            margin: 0; padding: 0; width: 100vw; height: 100vh;
-            background-color: black; overflow: hidden;
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #111; overflow: hidden;
             font-family: 'Press Start 2P', cursive; user-select: none;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* Загрузочный экран / Дисклеймер */
+        /* Ограничиваем игровое поле, чтобы фон влезал целиком */
+        #game-viewport {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            max-width: 100%;
+            max-height: 100%;
+            background: black;
+            overflow: hidden;
+            border: 2px solid #333;
+        }
+
         #disclaimer {
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: black; color: white; display: flex;
             justify-content: center; align-items: center; text-align: center;
             z-index: 2000; cursor: pointer; padding: 20px; box-sizing: border-box;
-            line-height: 1.8; font-size: 14px;
+            font-size: 12px; line-height: 1.6;
         }
-        #disclaimer span { display: none; } /* Текст появится через 4 сек */
 
-        /* Игровая зона */
         #game-container {
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; display: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;
         }
 
         #office-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://www.dropbox.com/scl/fi/cf1lv5tq2m8bey4e1asnd/Picsart_26-03-02_20-56-34-197.jpg?rlkey=nh08pgwtxjlm3zcdlfpk0tfy0&st=lxi83wwu&raw=1');
-            background-size: cover; background-position: center;
+            background-size: contain; /* ЧТОБЫ ВЛЕЗАЛО ЦЕЛИКОМ */
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
-        /* --- КНОПКИ (УМЕНЬШЕННЫЕ) --- */
+        /* КНОПКА DOOR УМЕНЬШЕНА В 4 РАЗА */
         #door-btn {
-            position: absolute; top: 50%; left: 0; transform: translateY(-50%);
-            width: 37.5px; height: 37.5px; /* Уменьшено в 4 раза (было 150) */
-            background: rgba(255, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.2);
-            color: white; cursor: pointer; z-index: 100; font-size: 8px; /* Уменьшен шрифт */
-            display: flex; justify-content: center; align-items: center;
+            position: absolute; top: 45%; left: 5%;
+            width: 50px; height: 50px; /* Было ~200px (на глаз по скринам), стало 50px */
+            background: rgba(255, 0, 0, 0.5);
+            border: 2px solid white; color: white; cursor: pointer;
+            z-index: 100; display: flex; justify-content: center; align-items: center;
+            font-size: 8px; border-radius: 5px;
         }
-        #door-btn:active { background: rgba(255, 0, 0, 0.7); }
 
         #tablet-toggle {
             position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 12.5%; height: 20px; /* Уменьшено в 4 раза (было 50% и 80px) */
-            background: rgba(255, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.2);
-            cursor: pointer; z-index: 500; display: flex; justify-content: center; align-items: center;
+            width: 40%; height: 60px; background: rgba(255, 0, 0, 0.4);
+            border: 2px solid black; cursor: pointer; z-index: 500;
+            display: flex; justify-content: center; align-items: center;
         }
-        #tablet-toggle span { color: black; font-size: 10px; font-family: sans-serif; } /* Уменьшен шрифт */
+        #tablet-toggle span { color: black; font-size: 30px; }
 
-        /* --- ПЛАНШЕТ (С ТЕКСТОМ ВНУТРИ) --- */
+        /* ПЛАНШЕТ */
         #tablet-container {
-            position: absolute; bottom: -120vh; left: 50%; transform: translateX(-50%);
-            width: 90vw; max-width: 800px; height: 85vh;
+            position: absolute; bottom: -100%; left: 50%; transform: translateX(-50%);
+            width: 90%; height: 70%;
             background-image: url('https://www.dropbox.com/scl/fi/1v8mb449dwf8dk9t5zj72/Picsart_26-03-02_21-03-49-458.png?rlkey=1zlecuityjxft1h8o6bky8r1p&st=palmnkk2&raw=1');
-            background-size: 100% 100%; transition: bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            z-index: 400; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background-size: 100% 100%; transition: bottom 0.3s ease-in-out; z-index: 400;
         }
-        #tablet-container.open { bottom: 20px; } /* Остается место для маленькой кнопки */
+        #tablet-container.open { bottom: 80px; }
 
-        /* Текст ВНУТРИ экрана планшета */
-        #tablet-ui-content {
-            width: 80%; height: 70%;
-            display: flex; flex-direction: column; justify-content: space-between;
-            align-items: center; color: white; text-align: center;
-            pointer-events: none; /* Чтобы текст не мешал тапать */
+        #tablet-ui {
+            position: absolute; top: 15%; left: 10%; width: 80%; height: 70%;
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; color: white; text-align: center; pointer-events: none;
         }
-        #tablet-date { font-size: 10px; margin-top: 10px; }
-        #tablet-time { font-size: 50px; text-shadow: 3px 3px 0 #000; }
-        #tablet-power { font-size: 12px; margin-bottom: 20px; }
+        #t-date { font-size: 8px; margin-bottom: 10px; }
+        #t-time { font-size: 40px; margin-bottom: 10px; }
+        #t-power { font-size: 10px; }
 
-        /* --- СКРИМЕР --- */
+        /* СКРИМЕР И КОНЦЫ */
         #screamer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('https://www.dropbox.com/scl/fi/gfrq4h9jmtmfigo6zngp7/Picsart_26-03-02_19-57-24-208.jpg?rlkey=f76rc2zyarz530o6za1fxey8b&st=m6irds1l&raw=1');
-            background-size: cover; background-position: center; z-index: 1000; display: none;
+            background-size: 100% 100%; z-index: 9999; display: none;
         }
-        .shake-flash { animation: shake 0.05s infinite, flash 0.1s infinite; }
-        @keyframes shake { 0% { transform: translate(15px, 15px); } 50% { transform: translate(-15px, -15px); } }
-        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.5; } }
+        .shake { animation: shake 0.05s infinite; }
+        @keyframes shake { 0% { transform: translate(5px,5px); } 50% { transform: translate(-5px,-5px); } }
 
-        /* --- ЭКРАНЫ ФИНАЛА --- */
-        #game-over, #win-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; color: white; z-index: 1500; display: none;
-            justify-content: center; align-items: center; text-align: center; font-size: 16px;
+        #win-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; color: white; z-index: 10000; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; font-size: 14px; padding: 20px;
         }
-        #game-over { background-image: url('https://www.dropbox.com/scl/fi/ck4qowly70bsbn29jrbw/Picsart_26-03-02_20-04-11-567.jpg?rlkey=7v6hv7kvg0xlzoiwp8gdqgemq&st=inr6e72n&raw=1'); background-size: cover; }
     </style>
 </head>
 <body>
 
-    <div id="disclaimer">
-        <span id="disc-text">Предупреждение: Игра имеет резкие сцены и неожиданные моменты, такие как скримеры или яркие вспышки. Играйте на своём риске.<br><br>Тапните на экран, чтобы начать игру.</span>
-    </div>
+<div id="game-viewport">
+    <div id="disclaimer"><span id="disc-text" style="display:none">Нажмите, чтобы начать...</span></div>
 
     <div id="game-container">
         <div id="office-bg"></div>
         <div id="door-btn">DOOR</div>
-        <div id="tablet-toggle"><span>▼</span></div>
+        <div id="tablet-toggle"><span>▲</span></div>
         <div id="tablet-container">
-            <div id="tablet-ui-content">
-                <div id="tablet-date">пн, 6 марта, 2012 год</div>
-                <div id="tablet-time">0:00</div>
-                <div id="tablet-power">Аккумулятор — 100%</div>
+            <div id="tablet-ui">
+                <div id="t-date">пн, 8 марта, 2012 год</div>
+                <div id="t-time">0:00</div>
+                <div id="t-power">100%</div>
             </div>
         </div>
     </div>
 
     <div id="screamer"></div>
-    <div id="game-over"></div>
-    <div id="win-screen">Игра в демо версии, спасибо за игру.<br><br>Постараемся выпустить как можно скорее бета версию.</div>
+    <div id="win-screen">6:00 AM<br><br>Вы выжили! Демо-версия окончена.</div>
+</div>
 
-    <script>
-        // Звуки
-        const sfxOffice = new Audio("https://www.dropbox.com/scl/fi/stbompykujm2unodwnyxf/fnaf-1-office-running-sfx-made-with-Voicemod.mp3?rlkey=f6gjk8dcqyr9ex08vg3fgvcn2&st=rgmq6egu&raw=1");
-        const sfxDoor = new Audio("https://www.dropbox.com/scl/fi/xqd8ophfm1rxtq4j9q2yb/SFXBible_12478.ogg.mp3?rlkey=tijiekcxqkb2ntc6bsnc5wtxf&st=l16h1bxc&raw=1");
-        const sfxTablet = new Audio("https://www.dropbox.com/scl/fi/x46rgpezdkfrigh0kti86/fnaf-open-camera-sound.mp3?rlkey=stri1wynmnvjeyjvqd2dcbx23&st=cvmnfted&raw=1");
-        const sfxPowerOut = new Audio("https://www.dropbox.com/scl/fi/8f7bbu83hoijjv9tx0lmt/power-outage-in-a-horror-game.mp3?rlkey=ts3trst80gr7c9p3vgyipdmif&st=0pxtpfkd&raw=1");
-        const sfxScreamer = new Audio("https://www.dropbox.com/scl/fi/c7gp7m5v3nrrs93yt3n1d/2_5312502910221850618.ogg?rlkey=2a19kt5nzp9uzd3we6qh059n1&st=nciqj38h&raw=1");
+<script>
+    const sfxOffice = new Audio("https://www.dropbox.com/scl/fi/stbompykujm2unodwnyxf/fnaf-1-office-running-sfx-made-with-Voicemod.mp3?rlkey=f6gjk8dcqyr9ex08vg3fgvcn2&st=rgmq6egu&raw=1");
+    const sfxDoor = new Audio("https://www.dropbox.com/scl/fi/xqd8ophfm1rxtq4j9q2yb/SFXBible_12478.ogg.mp3?rlkey=tijiekcxqkb2ntc6bsnc5wtxf&st=l16h1bxc&raw=1");
+    const sfxScreamer = new Audio("https://www.dropbox.com/scl/fi/c7gp7m5v3nrrs93yt3n1d/2_5312502910221850618.ogg?rlkey=2a19kt5nzp9uzd3we6qh059n1&st=nciqj38h&raw=1");
+    const sfxRuslanAtDoor = new Audio("https://www.dropbox.com/scl/fi/817w1oi32u4dpnpwmho6i/fnaf-animatronic-at-door-noise-made-with-Voicemod.mp3?rlkey=v7in8p6d6xoddfrexn8jidwyb&st=4n1pkg8x&raw=1");
 
-        // Бесшовный звук офиса
-        sfxOffice.addEventListener('timeupdate', function(){
-            if(this.currentTime > this.duration - 0.2) { this.currentTime = 0; this.play(); }
-        });
+    let power = 100, hour = 0, ticks = 0;
+    let door = false, tablet = false, dead = false, win = false;
+    let ruslan = "none", rTimer = 0;
 
-        // Переменные
-        let power = 100, hour = 0, timeMs = 0;
-        let door = false, tabletOpen = false, dead = false, win = false, powerOut = false;
-        let ruslanHere = false, ruslanTimer = 0;
+    setTimeout(() => document.getElementById("disc-text").style.display = "block", 1000);
 
-        // Дисклеймер (4 сек задержка)
-        setTimeout(() => document.getElementById("disc-text").style.display = "block", 4000);
+    document.getElementById("disclaimer").onclick = () => {
+        document.getElementById("disclaimer").style.display = "none";
+        document.getElementById("game-container").style.display = "block";
+        sfxOffice.loop = true; sfxOffice.play();
+        setInterval(loop, 100);
+    };
 
-        document.getElementById("disclaimer").onclick = () => {
-            if (document.getElementById("disc-text").style.display === "block") {
-                document.getElementById("disclaimer").style.display = "none";
-                document.getElementById("game-container").style.display = "block";
-                sfxOffice.play(); setInterval(loop, 100);
-            }
-        };
+    document.getElementById("door-btn").onclick = () => {
+        if (dead) return;
+        door = !door;
+        sfxDoor.currentTime = 0; sfxDoor.play();
+    };
 
-        // Дверь
-        document.getElementById("door-btn").onclick = () => {
-            if (powerOut || dead) return;
-            door = !door; sfxDoor.currentTime = 0; sfxDoor.play(); render();
-        };
+    document.getElementById("tablet-toggle").onclick = () => {
+        if (dead) return;
+        tablet = !tablet;
+        document.getElementById("tablet-container").classList.toggle("open", tablet);
+    };
 
-        // Планшет
-        document.getElementById("tablet-toggle").onclick = () => {
-            if (powerOut || dead) return;
-            tabletOpen = !tabletOpen;
-            sfxTablet.currentTime = 0; sfxTablet.play();
-            document.getElementById("tablet-container").classList.toggle("open", tabletOpen);
-        };
+    function loop() {
+        if (dead || win) return;
 
-        // Игровой цикл (каждые 100мс)
-        function loop() {
-            if (dead || win) return;
-
-            // Время (1 мин реальная = 1 час в игре)
-            timeMs += 100;
-            if (timeMs >= 60000) { timeMs = 0; hour++; document.getElementById("tablet-time").innerText = hour + ":00"; if (hour >= 6) return doWin(); }
-
-            // Энергия
-            if (!powerOut) {
-                let drain = door ? (1 / 30) : (1 / 60); // 1% каждые 3 сек или 6 сек
-                power -= drain;
-                if (power <= 0) { power = 0; doPowerOut(); }
-                document.getElementById("tablet-power").innerText = "Аккумулятор — " + Math.floor(power) + "%";
-            }
-
-            // Логика Руслана (Шанс 12%)
-            if (!powerOut && !ruslanHere && timeMs % 5000 === 0 && Math.random() < 0.12) {
-                ruslanHere = true; ruslanTimer = 0; render();
-            }
-
-            if (ruslanHere) {
-                ruslanTimer += 100;
-                if (door) {
-                    if (ruslanTimer >= 5000) { ruslanHere = false; ruslanTimer = 0; render(); } // Уходит
-                } else {
-                    if (ruslanTimer >= 2500) doScreamer(); // Нападает
-                }
-            }
+        ticks++;
+        if (ticks >= 600) { // 1 час = 60 сек
+            ticks = 0; hour++;
+            document.getElementById("t-time").innerText = hour + ":00";
+            if (hour >= 6) return doWin();
         }
 
-        // Рендер офиса
-        function render() {
-            const bg = document.getElementById("office-bg");
-            if (powerOut) bg.style.backgroundImage = "url('https://www.dropbox.com/scl/fi/6uf6896jkjnj2scd0dy1c/20260302_200033.jpg?rlkey=0c3olze67voh5am55p45ipxq9&st=580aw51i&raw=1')";
-            else if (ruslanHere) bg.style.backgroundImage = (door) ? "url('https://www.dropbox.com/scl/fi/4ahfp344b9ndavaei2ccj/Picsart_26-03-02_21-01-37-603.jpg?rlkey=0ei5oabrqh65n8o67x87s3jh5&st=k6kwbi43&raw=1')" : "url('https://www.dropbox.com/scl/fi/3uy3kw9cjd1e4swht6lcq/Picsart_26-03-02_21-00-43-622.jpg?rlkey=hmb9kx8rj1d3fwoaf0trtatub&st=vcyflxim&raw=1')";
-            else bg.style.backgroundImage = (door) ? "url('https://www.dropbox.com/scl/fi/escsy85g9yk4wnryxgr17/Picsart_26-03-02_20-59-41-179.jpg?rlkey=umbwcrkmaac1qau73ae4e7wg7&st=ledcg75e&raw=1')" : "url('https://www.dropbox.com/scl/fi/cf1lv5tq2m8bey4e1asnd/Picsart_26-03-02_20-56-34-197.jpg?rlkey=nh08pgwtxjlm3zcdlfpk0tfy0&st=lxi83wwu&raw=1')";
+        // Энергия
+        power -= door ? (1/30) : (1/60);
+        if (power <= 0) doScreamer();
+        document.getElementById("t-power").innerText = Math.floor(power) + "%";
+
+        // Руслан
+        if (ruslan === "none" && ticks % 50 === 0 && Math.random() < 0.12) {
+            ruslan = "door"; rTimer = 0;
+            sfxRuslanAtDoor.play();
         }
 
-        function doPowerOut() { powerOut = true; door = false; tabletOpen = false; document.getElementById("tablet-container").classList.remove("open"); sfxOffice.pause(); sfxPowerOut.play(); render(); setTimeout(() => { if (!win) doScreamer(); }, 7000); }
-        function doScreamer() { if (dead) return; dead = true; document.getElementById("screamer").style.display = "block"; document.getElementById("screamer").classList.add("shake-flash"); sfxOffice.pause(); sfxScreamer.play(); setTimeout(() => { document.getElementById("screamer").style.display = "none"; document.getElementById("game-over").style.display = "flex"; setTimeout(() => location.reload(), 7000); }, 5000); }
-        function doWin() { win = true; sfxOffice.pause(); document.getElementById("game-container").style.display = "none"; document.getElementById("win-screen").style.display = "flex"; setTimeout(() => location.reload(), 6000); }
-    </script>
+        if (ruslan === "door") {
+            if (door) { ruslan = "wait"; rTimer = 0; }
+            else if (++rTimer >= 28) doScreamer();
+        } else if (ruslan === "wait") {
+            if (++rTimer >= 50) ruslan = "none";
+            if (!door) doScreamer();
+        }
+
+        render();
+    }
+
+    function render() {
+        const bg = document.getElementById("office-bg");
+        if (ruslan === "door") bg.style.backgroundImage = "url('https://www.dropbox.com/scl/fi/3uy3kw9cjd1e4swht6lcq/Picsart_26-03-02_21-00-43-622.jpg?rlkey=hmb9kx8rj1d3fwoaf0trtatub&st=vcyflxim&raw=1')";
+        else if (ruslan === "wait") bg.style.backgroundImage = "url('https://www.dropbox.com/scl/fi/4ahfp344b9ndavaei2ccj/Picsart_26-03-02_21-01-37-603.jpg?rlkey=0ei5oabrqh65n8o67x87s3jh5&st=k6kwbi43&raw=1')";
+        else if (door) bg.style.backgroundImage = "url('https://www.dropbox.com/scl/fi/escsy85g9yk4wnryxgr17/Picsart_26-03-02_20-59-41-179.jpg?rlkey=umbwcrkmaac1qau73ae4e7wg7&st=ledcg75e&raw=1')";
+        else bg.style.backgroundImage = "url('https://www.dropbox.com/scl/fi/cf1lv5tq2m8bey4e1asnd/Picsart_26-03-02_20-56-34-197.jpg?rlkey=nh08pgwtxjlm3zcdlfpk0tfy0&st=lxi83wwu&raw=1')";
+    }
+
+    function doScreamer() {
+        if (dead) return; dead = true;
+        document.getElementById("screamer").style.display = "block";
+        document.getElementById("screamer").classList.add("shake");
+        sfxScreamer.play();
+        setTimeout(() => location.reload(), 3000);
+    }
+
+    function doWin() {
+        win = true;
+        document.getElementById("game-container").style.display = "none";
+        document.getElementById("win-screen").style.display = "flex";
+        setTimeout(() => location.reload(), 5000);
+    }
+</script>
 </body>
 </html>
 

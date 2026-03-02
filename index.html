@@ -2,200 +2,233 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Five Nights With Ruslan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Five Nights With Ruslan - ULTIMATE</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: black; font-family: 'Press Start 2P', cursive; }
-        #game-container { position: relative; width: 100vw; height: 100vh; display: none; }
-        #office { width: 100%; height: 100%; background-size: cover; background-position: center; }
-        
-        /* Планшет */
-        #tablet { 
-            position: absolute; bottom: -100%; left: 50%; transform: translateX(-50%);
-            width: 80%; height: 80%; background: url('https://www.dropbox.com/scl/fi/1v8mb449dwf8dk9t5zj72/Picsart_26-03-02_21-03-49-458.png?rlkey=1zlecuityjxft1h8o6bky8r1p&st=palmnkk2&dl=1') no-repeat center;
-            background-size: contain; transition: bottom 0.5s ease-in-out; z-index: 10; pointer-events: none;
+        body, html {
+            margin: 0; padding: 0; width: 100vw; height: 100vh;
+            background-color: black; overflow: hidden;
+            font-family: 'Press Start 2P', cursive; user-select: none;
         }
-        #tablet.active { bottom: 50px; }
-        #tablet-ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60%; color: white; text-align: center; }
-        .date-text { position: absolute; top: -120px; left: -80px; font-size: 10px; text-align: left; }
-        .time-text { font-size: 40px; margin-top: 20px; }
-        .battery-text { position: absolute; bottom: -150px; left: -80px; font-size: 12px; }
 
-        /* Кнопки */
-        .btn { position: absolute; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; text-transform: uppercase; }
-        #door-btn { left: 0; top: 40%; width: 80px; height: 150px; background: rgba(255, 0, 0, 0.3); color: white; font-size: 10px; border-right: 2px solid red; }
-        #tablet-btn { bottom: 0; left: 50%; transform: translateX(-50%); width: 250px; height: 50px; background: rgba(255, 0, 0, 0.3); border-top: 5px solid black; }
-        #tablet-btn::after { content: '▲'; color: black; font-size: 30px; }
+        /* 8-битный Дисклеймер */
+        #disclaimer {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: black; color: white; display: flex;
+            justify-content: center; align-items: center; text-align: center;
+            z-index: 2000; cursor: pointer; padding: 40px; box-sizing: border-box;
+            font-size: 14px; line-height: 2;
+        }
+        #disc-text { display: none; }
 
-        /* Дисклеймер */
-        #warning { position: fixed; width: 100%; height: 100%; background: black; color: white; display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center; z-index: 1000; font-size: 14px; line-height: 1.6; cursor: pointer; }
+        #game-container {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; display: none;
+        }
 
-        /* Спецэффекты */
-        .shake { animation: shake 0.1s infinite; }
-        @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
-        .flash { animation: flash 0.2s infinite; }
-        @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        #office-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+        }
+
+        /* Кнопки управления */
+        #door-btn {
+            position: absolute; top: 40%; left: 0;
+            width: 160px; height: 160px; background: rgba(255, 0, 0, 0.3);
+            border: 3px solid rgba(255,255,255,0.5); color: white; cursor: pointer;
+            z-index: 100; display: flex; justify-content: center; align-items: center;
+            font-size: 12px;
+        }
+
+        #tablet-toggle {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 120px; background: rgba(255, 0, 0, 0.4);
+            border: 4px solid black; cursor: pointer; z-index: 500;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #tablet-toggle span { color: black; font-size: 60px; font-weight: bold; }
+
+        /* ПЛАНШЕТ С ТЕКСТОМ ВНУТРИ */
+        #tablet-container {
+            position: absolute; bottom: -120vh; left: 50%; transform: translateX(-50%);
+            width: 95vw; height: 85vh;
+            background-image: url('https://www.dropbox.com/scl/fi/1v8mb449dwf8dk9t5zj72/Picsart_26-03-02_21-03-49-458.png?rlkey=1zlecuityjxft1h8o6bky8r1p&st=palmnkk2&raw=1');
+            background-size: 100% 100%; background-position: center;
+            transition: bottom 0.4s ease-in-out; z-index: 400;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        #tablet-container.open { bottom: 130px; }
+
+        /* Контент внутри экрана планшета */
+        #tablet-ui {
+            width: 70%; height: 60%;
+            display: flex; flex-direction: column; justify-content: space-between;
+            align-items: center; color: white; text-align: center; pointer-events: none;
+        }
+        #t-date { font-size: 10px; margin-top: 10px; }
+        #t-time { font-size: 60px; text-shadow: 4px 4px 0px #000; }
+        #t-power { font-size: 12px; margin-bottom: 20px; }
+
+        /* СКРИМЕР НА ВЕСЬ ЭКРАН */
+        #screamer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url('https://www.dropbox.com/scl/fi/gfrq4h9jmtmfigo6zngp7/Picsart_26-03-02_19-57-24-208.jpg?rlkey=f76rc2zyarz530o6za1fxey8b&st=m6irds1l&raw=1');
+            background-size: 100% 100%; z-index: 9999; display: none;
+        }
+        .shake-flash { animation: shake 0.05s infinite, flash 0.1s infinite; }
+        @keyframes shake { 0% { transform: translate(10px,10px); } 50% { transform: translate(-10px,-10px); } }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.6; } }
+
+        /* Концовки */
+        #game-over {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url('https://www.dropbox.com/scl/fi/ck4qowly70bsbn29jrbw/Picsart_26-03-02_20-04-11-567.jpg?rlkey=7v6hv7kvg0xlzoiwp8gdqgemq&st=inr6e72n&raw=1');
+            background-size: cover; z-index: 10000; display: none;
+        }
+        #win-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: black; color: white; z-index: 10000; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; font-size: 18px; padding: 20px;
+        }
     </style>
 </head>
 <body>
 
-<div id="warning">
-    Предупреждение: Игра имеет резкие сцены и неожиданные моменты, такие как скримеры или яркие вспышки. Играйте на своём риске. Тапните на экран, чтобы начать игру.
-</div>
+    <div id="disclaimer"><span id="disc-text">Предупреждение: Игра имеет резкие сцены и неожиданные моменты, такие как скримеры или яркие вспышки. Играйте на своём риске. <br><br> Тапните на экран, чтобы начать игру.</span></div>
 
-<div id="game-container">
-    <div id="office"></div>
-    
-    <div id="door-btn" class="btn">DOOR</div>
-    <div id="tablet-btn" class="btn"></div>
-
-    <div id="tablet">
-        <div id="tablet-ui">
-            <div class="date-text">пн, 6 марта, 2012 Г.</div>
-            <div class="time-text" id="clock">0:00</div>
-            <div class="battery-text" id="battery">Аккумулятор — 100%</div>
+    <div id="game-container">
+        <div id="office-bg"></div>
+        <div id="door-btn">DOOR</div>
+        <div id="tablet-toggle"><span>▲</span></div>
+        <div id="tablet-container">
+            <div id="tablet-ui">
+                <div id="t-date">пн, 8 марта, 2012 год</div>
+                <div id="t-time">0:00</div>
+                <div id="t-power">Аккумулятор — 100%</div>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    const assets = {
-        office: 'https://www.dropbox.com/scl/fi/cf1lv5tq2m8bey4e1asnd/Picsart_26-03-02_20-56-34-197.jpg?rlkey=nh08pgwtxjlm3zcdlfpk0tfy0&st=lxi83wwu&dl=1',
-        doorClosed: 'https://www.dropbox.com/scl/fi/escsy85g9yk4wnryxgr17/Picsart_26-03-02_20-59-41-179.jpg?rlkey=umbwcrkmaac1qau73ae4e7wg7&st=ledcg75e&dl=1',
-        ruslanAtDoor: 'https://www.dropbox.com/scl/fi/3uy3kw9cjd1e4swht6lcq/Picsart_26-03-02_21-00-43-622.jpg?rlkey=hmb9kx8rj1d3fwoaf0trtatub&st=vcyflxim&dl=1',
-        ruslanBlocked: 'https://www.dropbox.com/scl/fi/4ahfp344b9ndavaei2ccj/Picsart_26-03-02_21-01-37-603.jpg?rlkey=0ei5oabrqh65n8o67x87s3jh5&st=k6kwbi43&dl=1',
-        noPower: 'https://www.dropbox.com/scl/fi/6uf6896jkjnj2scd0dy1c/20260302_200033.jpg?rlkey=0c3olze67voh5am55p45ipxq9&st=580aw51i&dl=1',
-        screamImg: 'https://www.dropbox.com/scl/fi/gfrq4h9jmtmfigo6zngp7/Picsart_26-03-02_19-57-24-208.jpg?rlkey=f76rc2zyarz530o6za1fxey8b&st=m6irds1l&dl=1',
-        gameOverImg: 'https://www.dropbox.com/scl/fi/ck4qowlyht0bsbn29jrbw/Picsart_26-03-02_20-04-11-567.jpg?rlkey=7v6hv7kvg0xlzoiwp8gdqgemq&st=inr6e72n&dl=1',
-        officeAmbience: 'https://www.dropbox.com/scl/fi/stbompykujm2unodwnyxf/fnaf-1-office-running-sfx-made-with-Voicemod.mp3?rlkey=f6gjk8dcqyr9ex08vg3fgvcn2&st=rgmq6egu&dl=1',
-        doorSfx: 'https://www.dropbox.com/scl/fi/xqd8ophfm1rxtq4j9q2yb/SFXBible_12478.ogg.mp3?rlkey=tijiekcxqkb2ntc6bsnc5wtxf&st=l16h1bxc&dl=1',
-        powerOutSfx: 'https://www.dropbox.com/scl/fi/8f7bbu83hoijjv9tx0lmt/power-outage-in-a-horror-game.mp3?rlkey=ts3trst80gr7c9p3vgyipdmif&st=0pxtpfkd&dl=1',
-        screamerSfx: 'https://www.dropbox.com/scl/fi/c7gp7m5v3nrrs93yt3n1d/2_5312502910221850618.ogg?rlkey=2a19kt5nzp9uzd3we6qh059n1&st=nciqj38h&dl=1'
-    };
+    <div id="screamer"></div>
+    <div id="game-over"></div>
+    <div id="win-screen">Игра в демо версии, спасибо за игру.<br><br>Постараемся выпустить как можно скорее бета версию.</div>
 
-    let battery = 100;
-    let hour = 0;
-    let isDoorClosed = false;
-    let isTabletOpen = false;
-    let ruslanPresent = false;
-    let gameActive = false;
-    let ruslanTimer, attackTimer;
+    <script>
+        // Звуки
+        const sfxOffice = new Audio("https://www.dropbox.com/scl/fi/stbompykujm2unodwnyxf/fnaf-1-office-running-sfx-made-with-Voicemod.mp3?rlkey=f6gjk8dcqyr9ex08vg3fgvcn2&st=rgmq6egu&raw=1");
+        const sfxDoor = new Audio("https://www.dropbox.com/scl/fi/xqd8ophfm1rxtq4j9q2yb/SFXBible_12478.ogg.mp3?rlkey=tijiekcxqkb2ntc6bsnc5wtxf&st=l16h1bxc&raw=1");
+        const sfxTablet = new Audio("https://www.dropbox.com/scl/fi/x46rgpezdkfrigh0kti86/fnaf-open-camera-sound.mp3?rlkey=stri1wynmnvjeyjvqd2dcbx23&st=cvmnfted&raw=1");
+        const sfxPowerOut = new Audio("https://www.dropbox.com/scl/fi/8f7bbu83hoijjv9tx0lmt/power-outage-in-a-horror-game.mp3?rlkey=ts3trst80gr7c9p3vgyipdmif&st=0pxtpfkd&raw=1");
+        const sfxScreamer = new Audio("https://www.dropbox.com/scl/fi/c7gp7m5v3nrrs93yt3n1d/2_5312502910221850618.ogg?rlkey=2a19kt5nzp9uzd3we6qh059n1&st=nciqj38h&raw=1");
+        const sfxRuslanAtDoor = new Audio("https://www.dropbox.com/scl/fi/817w1oi32u4dpnpwmho6i/fnaf-animatronic-at-door-noise-made-with-Voicemod.mp3?rlkey=v7in8p6d6xoddfrexn8jidwyb&st=4n1pkg8x&raw=1");
 
-    const office = document.getElementById('office');
-    const ambience = new Audio(assets.officeAmbience);
-    ambience.loop = true;
+        let power = 100, hour = 0, ticks = 0;
+        let door = false, tablet = false, dead = false, win = false, powerOut = false;
+        let ruslan = "none", rTimer = 0;
 
-    // Старт игры
-    document.getElementById('warning').onclick = () => {
-        setTimeout(() => {
-            document.getElementById('warning').style.display = 'none';
-            document.getElementById('game-container').style.display = 'block';
-            gameActive = true;
-            office.style.backgroundImage = `url(${assets.office})`;
-            ambience.play();
-            startGameLogic();
-        }, 4000);
-    };
+        // Старт
+        setTimeout(() => document.getElementById("disc-text").style.display = "block", 4000);
 
-    function startGameLogic() {
-        // Таймер времени (1 час = 60 сек)
-        setInterval(() => {
-            if (!gameActive) return;
-            hour++;
-            document.getElementById('clock').innerText = `${hour}:00`;
-            if (hour >= 6) winGame();
-        }, 60000);
+        document.getElementById("disclaimer").onclick = () => {
+            if (document.getElementById("disc-text").style.display === "block") {
+                document.getElementById("disclaimer").style.display = "none";
+                document.getElementById("game-container").style.display = "block";
+                sfxOffice.loop = true; sfxOffice.play();
+                setInterval(loop, 100);
+            }
+        };
 
-        // Расход батареи
-        setInterval(() => {
-            if (!gameActive) return;
-            let rate = isDoorClosed ? 7000 : 11000;
-            setTimeout(() => {
-                battery--;
-                document.getElementById('battery').innerText = `Аккумулятор — ${battery}%`;
-                if (battery <= 0) powerOutage();
-            }, rate);
-        }, 1000);
+        // Дверь
+        document.getElementById("door-btn").onclick = () => {
+            if (powerOut || dead) return;
+            door = !door;
+            sfxDoor.currentTime = 0; sfxDoor.play();
+        };
 
-        // Появление Руслана (случайное)
-        setInterval(() => {
-            if (!gameActive || ruslanPresent || isDoorClosed) return;
-            if (Math.random() > 0.7) spawnRuslan();
-        }, 5000);
-    }
+        // Планшет
+        document.getElementById("tablet-toggle").onclick = () => {
+            if (powerOut || dead) return;
+            tablet = !tablet;
+            sfxTablet.currentTime = 0; sfxTablet.play();
+            document.getElementById("tablet-container").classList.toggle("open", tablet);
+        };
 
-    // Дверь
-    document.getElementById('door-btn').onclick = () => {
-        if (!gameActive || battery <= 0) return;
-        const sfx = new Audio(assets.doorSfx);
-        sfx.play(); // Мгновенный звук
-        isDoorClosed = !isDoorClosed;
-        updateOfficeView();
-    };
+        function loop() {
+            if (dead || win) return;
 
-    // Планшет
-    document.getElementById('tablet-btn').onclick = () => {
-        if (!gameActive) return;
-        isTabletOpen = !isTabletOpen;
-        document.getElementById('tablet').classList.toggle('active');
-    };
+            // Время: 1 мин (600 тиков) = 1 час
+            ticks++;
+            if (ticks >= 600) {
+                ticks = 0; hour++;
+                document.getElementById("t-time").innerText = hour + ":00";
+                if (hour >= 6) return doWin();
+            }
 
-    function updateOfficeView() {
-        if (ruslanPresent && isDoorClosed) {
-            office.style.backgroundImage = `url(${assets.ruslanBlocked})`;
-            clearTimeout(attackTimer);
-            setTimeout(() => {
-                ruslanPresent = false;
-                updateOfficeView();
-            }, 5000);
-        } else if (ruslanPresent && !isDoorClosed) {
-            office.style.backgroundImage = `url(${assets.ruslanAtDoor})`;
-        } else if (isDoorClosed) {
-            office.style.backgroundImage = `url(${assets.doorClosed})`;
-        } else {
-            office.style.backgroundImage = `url(${assets.office})`;
+            // Энергия
+            let drain = door ? (1 / 30) : (1 / 60);
+            power -= drain;
+            if (power <= 0) { power = 0; doPowerOut(); }
+            document.getElementById("t-power").innerText = "Аккумулятор — " + Math.floor(power) + "%";
+
+            // Руслан (Шанс 12%)
+            if (!powerOut && ruslan === "none" && ticks % 50 === 0) {
+                if (Math.random() < 0.12) {
+                    ruslan = "door"; rTimer = 0;
+                    sfxRuslanAtDoor.currentTime = 0; sfxRuslanAtDoor.play();
+                }
+            }
+
+            if (ruslan === "door") {
+                if (door) { ruslan = "wait"; rTimer = 0; }
+                else {
+                    rTimer++;
+                    if (rTimer >= 28) doScreamer(); // 2.75 сек (+- погрешность)
+                }
+            } else if (ruslan === "wait") {
+                rTimer++;
+                if (!door) doScreamer();
+                if (rTimer >= 50) { ruslan = "none"; rTimer = 0; } // Ушел
+            }
+
+            render();
         }
-    }
 
-    function spawnRuslan() {
-        ruslanPresent = true;
-        updateOfficeView();
-        attackTimer = setTimeout(() => {
-            if (!isDoorClosed) triggerScreamer();
-        }, 2500);
-    }
+        function render() {
+            const bg = document.getElementById("office-bg");
+            if (powerOut) { bg.style.backgroundImage = "url('https://www.dropbox.com/scl/fi/6uf6896jkjnj2scd0dy1c/20260302_200033.jpg?rlkey=0c3olze67voh5am55p45ipxq9&st=580aw51i&raw=1')"; return; }
+            
+            if (ruslan === "door") bg.style.backgroundImage = "url('https://www.dropbox.com/scl/fi/3uy3kw9cjd1e4swht6lcq/Picsart_26-03-02_21-00-43-622.jpg?rlkey=hmb9kx8rj1d3fwoaf0trtatub&st=vcyflxim&raw=1')";
+            else if (ruslan === "wait") bg.style.backgroundImage = "url('https://www.dropbox.com/scl/fi/4ahfp344b9ndavaei2ccj/Picsart_26-03-02_21-01-37-603.jpg?rlkey=0ei5oabrqh65n8o67x87s3jh5&st=k6kwbi43&raw=1')";
+            else if (door) bg.style.backgroundImage = "url('https://www.dropbox.com/scl/fi/escsy85g9yk4wnryxgr17/Picsart_26-03-02_20-59-41-179.jpg?rlkey=umbwcrkmaac1qau73ae4e7wg7&st=ledcg75e&raw=1')";
+            else bg.style.backgroundImage = "url('https://www.dropbox.com/scl/fi/cf1lv5tq2m8bey4e1asnd/Picsart_26-03-02_20-56-34-197.jpg?rlkey=nh08pgwtxjlm3zcdlfpk0tfy0&st=lxi83wwu&raw=1')";
+        }
 
-    function triggerScreamer() {
-        gameActive = false;
-        ambience.pause();
-        const s = new Audio(assets.screamerSfx);
-        s.play();
-        office.style.backgroundImage = `url(${assets.screamImg})`;
-        office.classList.add('shake', 'flash');
-        setTimeout(() => {
-            office.classList.remove('shake', 'flash');
-            office.style.backgroundImage = `url(${assets.gameOverImg})`;
-            setTimeout(() => location.reload(), 7000);
-        }, 5000);
-    }
+        function doPowerOut() {
+            powerOut = true; door = false; tablet = false;
+            document.getElementById("tablet-container").classList.remove("open");
+            sfxOffice.pause(); sfxPowerOut.play();
+            setTimeout(() => { if (!win) doScreamer(); }, 7000);
+        }
 
-    function powerOutage() {
-        gameActive = false;
-        isDoorClosed = false;
-        ambience.pause();
-        new Audio(assets.powerOutSfx).play();
-        office.style.backgroundImage = `url(${assets.noPower})`;
-        setTimeout(triggerScreamer, 7000);
-    }
+        function doScreamer() {
+            if (dead) return; dead = true;
+            const scr = document.getElementById("screamer");
+            scr.style.display = "block"; scr.classList.add("shake-flash");
+            sfxOffice.pause(); sfxRuslanAtDoor.pause(); sfxScreamer.play();
+            setTimeout(() => {
+                scr.style.display = "none";
+                document.getElementById("game-over").style.display = "block";
+                setTimeout(() => location.reload(), 7000);
+            }, 5000);
+        }
 
-    function winGame() {
-        gameActive = false;
-        ambience.pause();
-        document.body.innerHTML = '<div id="warning" style="display:flex">Игра в демо версии, спасибо за игру. Постараемся выпустить как можно скорее бета версию.</div>';
-        setTimeout(() => location.reload(), 6000);
-    }
-</script>
+        function doWin() {
+            win = true; sfxOffice.pause();
+            document.getElementById("game-container").style.display = "none";
+            document.getElementById("win-screen").style.display = "flex";
+            setTimeout(() => location.reload(), 6000);
+        }
+    </script>
 </body>
 </html>
-
